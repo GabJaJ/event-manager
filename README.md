@@ -1,11 +1,8 @@
 # Decentralized Event Manager - Solana - Rust
 
-
-
 ✨ **DECENTRALIZED EVENT MANAGER** ✨
 
-
-## PROGRAM OF ADMINISTRATION OF EVENTS IN SOLANA
+## ADMINISTRATION EVENTS PROGRAM IN SOLANA
 
 The objective of this project is to develop a
 DECENTRALIZED EVENT MANAGER
@@ -42,5 +39,3 @@ withdraw the amount that corresponds to you from the
 Profit Vault, value that is calculated from
 proportional to the number of Tokens in the
 Event acquired by each collaborator.
-
-
