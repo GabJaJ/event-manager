@@ -22,7 +22,7 @@ export const createMint = async (
     await provider.sendAndConfirm(
         new web3.Transaction()
             .add(
-                // create mint account
+                // create mint account instruction
                 web3.SystemProgram.createAccount({
                     programId: TOKEN_PROGRAM_ID, // program_id
                     space: MintLayout.span, // space
@@ -32,7 +32,7 @@ export const createMint = async (
                 })
             )
             .add(
-                // initialize mint account
+                // initialize mint account instruction
                 createInitializeMintInstruction(
                     tokenMint.publicKey, // token address
                     decimals, // decimals
