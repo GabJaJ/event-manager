@@ -6,7 +6,7 @@ import {
 } from '@solana/spl-token';
 
 //create new Token (Mint Account)
-export cont createMint = async (
+export const createMint = async (
     provider: AnchorProvider,
     decimals = 0 // no decimals
 ): Promise<web3.PublicKey> => {
@@ -14,8 +14,8 @@ export cont createMint = async (
     const tokenMint = new web3.Keypair();
     // calculate rent
     const lamportsForMint =
-        await provider.connection.getMinimumBalanceForRentExeotion(
-            MintLAyout.span // MintLayout
+        await provider.connection.getMinimumBalanceForRentExemption(
+            MintLayout.span // MintLayout
         );
 
     // Allocate mint and wallet account
