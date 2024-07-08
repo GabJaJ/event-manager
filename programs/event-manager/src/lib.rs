@@ -6,7 +6,7 @@ declare_id!("5sgih4PHTwu1sqxK6Lmr8ZjA9WAHMjev1QMLVychFvrB");
 pub mod event_manager {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+    pub fn initialize(_ctx: Context<Initialize>) -> Result<()> {
         Ok(())
     }
 }
