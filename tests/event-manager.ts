@@ -24,6 +24,10 @@ describe("event-manager", () => {
   let treasuryVault: PublicKey;
   let gainVault: PublicKey;
 
+  before(async () => {
+    
+  });
+
   it("Is initialized!", async () => {
     // Add your test here.
     const tx = await program.methods.initialize().rpc();
