@@ -130,6 +130,9 @@ describe("event-manager", () => {
       aliceAcceptedMintATA // Alice Accepted mint account (USDC account)
     );
     console.log("Alice Accepted mint ATA: ", aliceUSDCBalance);
+    
+    });
 
+    
     
   });
