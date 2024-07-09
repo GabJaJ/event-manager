@@ -3,7 +3,7 @@ import { Program } from "@coral-xyz/anchor";
 import { EventManager } from "../target/types/event_manager";
 import { BN } from "bn.js";
 import { Keypair, PublicKey } from '@solana/web3.js';
-import { createMint } from './utils';
+import { createFundedWallet, createMint } from './utils';
 
 describe("event-manager", () => {
   // Configure the client to use the local cluster.
@@ -25,8 +25,13 @@ describe("event-manager", () => {
   let treasuryVault: PublicKey;
   let gainVault: PublicKey;
 
+  // Sponsor
+  let alice: Keypair; // alice key pair - first sponsor
+  let aliceAcceptedMintData: PublicKey; // alice accepted mint ATA
+  let aliceEventMintATA: PublicKey; // alice event mint ATA
+
   before(async () => {
-    acceptedMint = await createMint(provider);
+    acceptedMint = await createMint(provider); // aux functions solana web3
 
     // find event account PDA
     [eventPublicKey] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -52,8 +57,22 @@ describe("event-manager", () => {
       program.programId
     );
 
+    // creates a new wallet funded with 3 SOL 
+    alice = await createFundedWallet(provider, 3);
+    // create alice accepted mint ata with 100 accepted mint
+    // Accepted mint = USDC  -> alice wallet = 100 USDC 
+    aliceAcceptedMintATA = await createAssociatedTokenAccount(provider,acceptedMint,100, alice);
+    // find alice event mint ata (only finds address)
+    aliceEventMintATA = await getAssociatedTokenAddress(eventMint, alice.publicKey);
+
+    // find provided (event organizer) wallet acceptend mint ata
+    // only the address
+    walletAcceptedMintATA = await getAssociatedTokenAddress(acceptedMint, provider.wallet.publicKey);
+
+
   });
 
+  // TEST: Create an Event
   it("Is initialized!", async () => {
     const name: string = "my_event";
     const ticketPrice = new BN(1);
