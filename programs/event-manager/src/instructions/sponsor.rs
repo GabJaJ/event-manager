@@ -20,6 +20,7 @@ pub struct Sponsor<'info> {
     )]
     pub event: Box<Account<'info, Event>>, // event account
 
+    // event mint
     #[account(
     mut,
     seeds = [
@@ -39,6 +40,7 @@ pub struct Sponsor<'info> {
     )]
     pub payer_accepted_mint_ata: Box<Account<'info, TokenAccount>>, 
 
+    // mint account
     #[account(
         init_if_needed, // create account if doesn't exist
         payer = authority, 
@@ -47,6 +49,7 @@ pub struct Sponsor<'info> {
     )]
     pub payer_event_mint_ata: Box<Account<'info, TokenAccount>>, // payer event mint ATA
 
+    // treasury vault
     #[account(
         mut,
         seeds = [
@@ -66,9 +69,10 @@ pub struct Sponsor<'info> {
     pub system_program: Program<'info, System>,
 }
 
+// sponsor function
 pub fn handle(
     ctx: Context<Sponsor>,
-    quantity: u64,
+    quantity: u64, //sponsorship tokens
 ) -> Result<()> {
     let seeds = [
         Event::SEED_EVENT.as_bytes(),
@@ -76,7 +80,7 @@ pub fn handle(
         &[ctx.accounts.event.event_bump],
     ];
     let signer = &[&seeds[..]];
-    // Charge the accepted_token amount from payer
+    // Charge the accepted_token amount from payer CPI context
     transfer(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -88,7 +92,7 @@ pub fn handle(
         ),
         quantity,
     )?;
-    // Transfer the token
+    // Transfer the token - CPI with PDAs context 
     mint_to(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
