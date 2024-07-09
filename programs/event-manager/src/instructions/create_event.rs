@@ -1,4 +1,4 @@
-use {crate::colections::Event, anchor_lang::prelude::*, anchor_spl::teken::*};
+use {crate::collections::Event, anchor_lang::prelude::*, anchor_spl::token::*};
 
 #[derive(Accounts)]
 pub struct CreateEvent<'info> {
@@ -13,14 +13,14 @@ pub struct CreateEvent<'info> {
         payer = authority,
         space = 8 + Event::INIT_SPACE
     )]
-    pub event: Account<'info, Event>,
+    pub event: Box<Account<'info, Event>>, // event account
 
-    pub accepted_mint: Account<'info, Mint>,
+    pub accepted_mint: Box<Account<'info, Mint>>, // accepted mint
 
     // "event_mint"
     #[account(
         init,
-        seed = [
+        seeds = [
             Event::SEED_EVENT_MINT.as_ref(), // "event_mint"
             event.key().as_ref() // event public key
         ],
@@ -29,7 +29,7 @@ pub struct CreateEvent<'info> {
         mint::decimals = 0, // no decimals = 1:1
         mint::authority = event, // only "event" can print tokens
     )]
-    pub event_mint: Account<'info, Mint>,
+    pub event_mint: Box<Account<'info, Mint>>,
 
     // "treasury_vault"
     #[account(
@@ -43,7 +43,7 @@ pub struct CreateEvent<'info> {
         token::mint = accepted_mint, // accepted mint
         token:: authority = event,
     )]
-    pub treasury_vault: Account<'info, TokenAccount>,
+    pub treasury_vault: Box<Account<'info, TokenAccount>>,
 
     // "gain_vault"
     #[account(
@@ -57,7 +57,7 @@ pub struct CreateEvent<'info> {
         token::mint = accepted_mint, // accepted mint
         token:: authority = event,
     )]
-    pub gain_vault: Account<'info, TokenAccount>,
+    pub gain_vault: Box<Account<'info, TokenAccount>>, // event gain vault - hip memo
 
     #[account(mut)]
     pub authority: Signer<'info>, // event authority
@@ -67,13 +67,16 @@ pub struct CreateEvent<'info> {
 }
 
 pub fn handle(ctx: Context<CreateEvent>, name: String, ticket_price: u64) -> Result<()> {
+    // data
     ctx.accounts.event.name = name;
     ctx.accounts.event.ticket_price = ticket_price;
     ctx.accounts.event.active = true;
 
+    // accounts
     ctx.accounts.event.authority = ctx.accounts.authority.key();
-    ctx.accounts.event.accepted_mint = ctx.accounts.accepted_mint - key();
+    ctx.accounts.event.accepted_mint = ctx.accounts.accepted_mint.key();
 
+    // bumps
     ctx.accounts.event.event_bump = ctx.bumps.event;
     ctx.accounts.event.event_mint_bump = ctx.bumps.event_mint;
     ctx.accounts.event.treasury_vault_bump = ctx.bumps.treasury_vault;

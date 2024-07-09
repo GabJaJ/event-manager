@@ -1,10 +1,10 @@
 use anchor_lang::prelude::*;
 
 #[account]
-#[derive(initSpace)] //automatic space calc
+#[derive(InitSpace)] //automatic space calc
 pub struct Event {
     // event data
-    #[max_len(40)]
+    #[max_len(40)] // event name should be 40 characters or less
     pub name: String,
     pub ticket_price: u64,
     pub active: bool,
