@@ -130,9 +130,49 @@ describe("event-manager", () => {
       aliceAcceptedMintATA // Alice Accepted mint account (USDC account)
     );
     console.log("Alice Accepted mint ATA: ", aliceUSDCBalance);
-    
-    });
 
-    
-    
   });
+
+  // TEST: Buy 2 Tickets
+  it("Alice buy 2 tickets", async () => {
+    // show alice accepted mint (USDC) ATA info
+    // should have 95 USDC
+    let aliceUSDCBalance = await getAccount(
+      provider.connection,
+      aliceAcceptedMintATA // Alice Accepted mint account (USDC account)
+    );
+    console.log("Alice Accepted mint ATA: ", aliceUSDCBalance);
+
+    const quantity = new BN(2); // 2 tickets
+    await program.methods
+      .buyTickets(quantity)
+      .accounts({
+        payerAcceptedMintAta: aliceAcceptedMintATA, // Alice Accepted mint (USDC) account
+        event: eventPublicKey,
+        authority: alice.publicKey,
+        gainVault: gainVault // stores all accepted mint (USDC) from tickets purchase
+      })
+      .signers([alice])
+      .rpc();
+
+    // show event gain vault info
+    // should have 4 USDC ( 2 tickets x 2 USDC (tickect_price))
+    const gainVaultAccount = await getAccount(
+      provider.connection,
+      gainVault // stores all accepted mint (USDC) from tickets purchase
+    );
+    console.log("Event gain vault: ", gainVaultAccount);
+
+    // show alice accepted mint (USDC) ATA info
+    // shoul have 91 (95-4) USDC
+    aliceUSDCBalance = await getAccount(
+      provider.connection,
+      aliceAcceptedMintATA // Alice Accepted mint account (USDC account)
+    );
+    console.log("Alice Accepted mint ATA: ", aliceUSDCBalance);
+
+  });
+
+
+
+});

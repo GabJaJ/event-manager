@@ -17,4 +17,9 @@ pub mod event_manager {
     pub fn sponsor_event(ctx: Context<Sponsor>, quantity: u64) -> Result<()> {
         instructions::sponsor::handle(ctx, quantity)
     }
+
+    // buy tickets
+    pub fn buy_tickets(ctx: Context<BuyTickets>, quantity: u64) -> Result<()> {
+        instructions::buy_tickets::handle(ctx, quantity)
+    }
 }
