@@ -55,8 +55,8 @@ pub fn handle(
         .event
         .ticket_price
         .checked_mul(quantity)
-        .unwrap();
-    // Charge the amount
+        .unwrap();  // get final result
+    // Charge the amount - cross program invocation
     transfer(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),

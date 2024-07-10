@@ -15,6 +15,6 @@ pub mod event_manager {
 
     // sponsor event (get event mint tokens)
     pub fn sponsor_event(ctx: Context<Sponsor>, quantity: u64) -> Result<()> {
-        instrucions::sponsor::handle(ctx, quantity)
+        instructions::sponsor::handle(ctx, quantity)
     }
 }

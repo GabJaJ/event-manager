@@ -21,6 +21,7 @@ pub struct Event {
 }
 
 impl Event {
+    // custom seeds
     pub const SEED_EVENT: &'static str = "event";
     pub const SEED_EVENT_MINT: &'static str = "event_mint";
     pub const SEED_TREASURY_VAULT: &'static str = "treasury_vault";
