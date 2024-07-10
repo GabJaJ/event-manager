@@ -76,7 +76,7 @@ describe("event-manager", () => {
   // TEST: Create an Event
   it("Is initialized!", async () => {
     const name: string = "my_event";
-    const ticketPrice = new BN(1);
+    const ticketPrice = new BN(2);
     const tx = await program.methods.createEvent(name, ticketPrice)
       .accounts({
         event: eventPublicKey,
@@ -147,7 +147,7 @@ describe("event-manager", () => {
     await program.methods
       .buyTickets(quantity)
       .accounts({
-        payerAcceptedMintAta: aliceAcceptedMintATA, // Alice Accepted mint (USDC) account
+        payerAcceptedMintAta: aliceAcceptedMintATA, // Alice Accepted - 4 mint (USDC) account
         event: eventPublicKey,
         authority: alice.publicKey,
         gainVault: gainVault // stores all accepted mint (USDC) from tickets purchase
@@ -172,7 +172,38 @@ describe("event-manager", () => {
     console.log("Alice Accepted mint ATA: ", aliceUSDCBalance);
 
   });
+  // TEST: Withdraw Funds
+  it("Event organizer should withdraw funds", async () => {
 
+    const amount = new BN(1); // 1 USDC
+    await program.methods
+      .withdrawFunds(amount)
+      .accounts({
+        event: eventPublicKey,
+        acceptedMint: acceptedMint, // example: USDC
+        authority: provider.wallet.publicKey, // event organizer
+        treasuryVault: treasuryVault, // stores all Accepted Mint (USDC) from sponsorships
+        authotiryAcceptedMintAta: walletAcceptedMintATA, // account where the event organizer receives accepted mint(USDC)
+      })
+      .rpc();
+
+    // show event treasury vault info
+    // should have 4 (5-1) USDC
+    const treasuryVaultAccount = await getAccount(
+      provider.connection,
+      treasuryVault
+    );
+    console.log("Event treasury vault: ", treasuryVaultAccount);
+
+    // show event organizer accepted mint (USDC) ATA info
+    // should have 1 accepte mint (USDC) 
+    const organizerUSDCBalance = await getAccount(
+      provider.connection,
+      walletAcceptedMintATA // event organizer Accepted mint account (USDC account)
+    );
+    console.log("Alice Accepted mint ATA: ", organizerUSDCBalance);
+
+  });
 
 
 });
