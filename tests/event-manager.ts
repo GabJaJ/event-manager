@@ -28,7 +28,7 @@ describe("event-manager", () => {
 
   // Sponsor
   let alice: Keypair; // alice key pair - first sponsor
-  let aliceAcceptedMintData: PublicKey; // alice accepted mint ATA
+  let aliceAcceptedMintATA: PublicKey; // alice accepted mint ATA
   let aliceEventMintATA: PublicKey; // alice event mint ATA
 
   before(async () => {
@@ -113,7 +113,7 @@ describe("event-manager", () => {
         payerEventMintAta: aliceEventMintATA, // Alice Event Mint Account
         treasuryVault: treasuryVault // store all Accepted mint (USDC) from sponsorships
       })
-      .signers([alice])
+      .signers([alice]) // alice pays transaction 
       .rpc();
     // show alice event mint ATA info
     // should have 5 Event mint
@@ -133,7 +133,7 @@ describe("event-manager", () => {
 
   });
 
-  // TEST: Buy 2 Tickets
+  // TEST: Alice, Buy 2 Tickets
   it("Alice buy 2 tickets", async () => {
     // show alice accepted mint (USDC) ATA info
     // should have 95 USDC
@@ -172,6 +172,8 @@ describe("event-manager", () => {
     console.log("Alice Accepted mint ATA: ", aliceUSDCBalance);
 
   });
+
+
   // TEST: Withdraw Funds
   it("Event organizer should withdraw funds", async () => {
 

@@ -31,16 +31,16 @@ pub struct Sponsor<'info> {
     )]
     pub event_mint: Box<Account<'info, Mint>>, // event mint account PDA
 
-    // payer accepted mint ATA 
+    // payer accepted mint ATA - user wallet account that contains the accepted mints tha this gonna transfer to our account
     #[account(
         mut,
         // checks the ATA holds the accepted mint
         constraint = payer_accepted_mint_ata.mint == event.accepted_mint,
         constraint = payer_accepted_mint_ata.amount > 0
     )]
-    pub payer_accepted_mint_ata: Box<Account<'info, TokenAccount>>, 
-
-    // mint account
+    pub payer_accepted_mint_ata: Box<Account<'info, TokenAccount>>, // give the token in the specific box
+    
+    // mint account - asosiated token acount mint event in change of the sponsorship 
     #[account(
         init_if_needed, // create account if doesn't exist
         payer = authority, 
@@ -49,7 +49,7 @@ pub struct Sponsor<'info> {
     )]
     pub payer_event_mint_ata: Box<Account<'info, TokenAccount>>, // payer event mint ATA
 
-    // treasury vault
+    // treasury vault - treasury: sponsorship profit - gain: tickets sales profits
     #[account(
         mut,
         seeds = [
@@ -80,7 +80,7 @@ pub fn handle(
         &[ctx.accounts.event.event_bump],
     ];
     let signer = &[&seeds[..]];
-    // Charge the accepted_token amount from payer CPI context
+    // Charge the accepted_token amount from payer Cross Program Invocation (CPI) context
     transfer(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -94,16 +94,16 @@ pub fn handle(
     )?;
     // Transfer the token - CPI with PDAs context 
     mint_to(
-        CpiContext::new_with_signer(
+        CpiContext::new_with_signer( // Because the Event is the autorithy and a PDA, we need to sign with the seed 
             ctx.accounts.token_program.to_account_info(),
             MintTo {
                 mint: ctx.accounts.event_mint.to_account_info(),
                 to: ctx.accounts.payer_event_mint_ata.to_account_info(),
                 authority: ctx.accounts.event.to_account_info(),
             },
-            signer,
+            signer, // seed = signer
         ),
-        quantity,
+        quantity, // tokens quantity to mint
     )?;
     Ok(())
 }

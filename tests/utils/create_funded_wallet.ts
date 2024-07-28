@@ -13,7 +13,7 @@ export const createFundedWallet = async (
             web3.SystemProgram.transfer({
                 fromPubkey: provider.wallet.publicKey, // provider wallet
                 toPubkey: user.publicKey, // new user wallet
-                lamports: amount * web3.LAMPORTS_PER_SOL, // amount in lamports(solana smal unit)
+                lamports: amount * web3.LAMPORTS_PER_SOL, // amount in lamports(solana small unit)
             })
         )
     );

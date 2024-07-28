@@ -45,6 +45,7 @@ pub struct BuyTickets<'info> {
     pub system_program: Program<'info, System>,
 }
 
+// Buy tickets instruction
 pub fn handle(
     ctx: Context<BuyTickets>,
     quantity: u64,
@@ -54,10 +55,12 @@ pub fn handle(
         .accounts
         .event
         .ticket_price
-        .checked_mul(quantity)
-        .unwrap();  // get final result
-    // Charge the amount - cross program invocation
-    transfer(
+        .checked_mul(quantity) // secure way to multiplicate u64 amounts
+        .unwrap();  // get final result - not as Option
+
+    // Charge the amount - cross program invocation (CPI)
+    // deposit from any account to our gain vault
+    transfer( 
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
             Transfer {
