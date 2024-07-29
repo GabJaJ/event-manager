@@ -207,5 +207,23 @@ describe("event-manager", () => {
 
   });
 
+  // TEST: Close Event
+  it("event organizer should close event", async () => {
+    // act
+    await program.methods
+      .closeEvent()
+      .accounts({
+        event: eventPublicKey,
+        authority: provider.wallet.publicKey
+      })
+      .rpc();
+
+    // show new event info
+    const eventAccount = await program.account.event.fetch(eventPublicKey);
+    console.log("Event is active: ", eventAccount.active);
+  });
+
+  
+
 
 });

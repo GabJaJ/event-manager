@@ -32,7 +32,4 @@ pub mod event_manager {
     pub fn close_event(ctx: Context<CloseEvent>) -> Result<()> {
         instructions::close_event::handle(ctx)
     }
-
-
-    
 }
