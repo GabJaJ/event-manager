@@ -19,6 +19,6 @@ pub struct CloseEvent<'info> {
 }
 
 pub fn handle(ctx: Context<CloseEvent>) -> Result<()> {
-    ctx.accounts.event.active = false;
+    ctx.accounts.event.active = false; 
     Ok(())
 }
