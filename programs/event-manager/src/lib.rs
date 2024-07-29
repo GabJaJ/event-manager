@@ -32,4 +32,9 @@ pub mod event_manager {
     pub fn close_event(ctx: Context<CloseEvent>) -> Result<()> {
         instructions::close_event::handle(ctx)
     }
+
+    // withdraw earnings
+    pub fn withdraw_earnings(ctx: Context<WithdrawEarnings>) -> Result<()> {
+        instructions::withdraw_earnings::handle(ctx)
+    }
 }

@@ -105,5 +105,6 @@ pub fn handle(
         ),
         quantity, // tokens quantity to mint
     )?;
+    ctx.accounts.event.sponsors += quantity; // how many sponsorship tokens stored
     Ok(())
 }
