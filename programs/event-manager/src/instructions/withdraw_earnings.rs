@@ -27,7 +27,7 @@ pub struct WithdrawEarnings<'info> {
     pub user_accepted_mint_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
-    // account burning tevent mint tokens
+    // account burning event mint tokens
     pub user_event_mint_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(
@@ -47,6 +47,8 @@ pub struct WithdrawEarnings<'info> {
     pub system_program: Program<'info, System>,
 }
 
+// Withdraw earings function
+
 pub fn handle(ctx: Context<WithdrawEarnings>) -> Result<()> {
     // total event mint tokens sold (total in treasury vault)
     let total_tokens = ctx.accounts.event.sponsors;
@@ -56,6 +58,7 @@ pub fn handle(ctx: Context<WithdrawEarnings>) -> Result<()> {
     let total_earnings = ctx.accounts.gain_vault.amount;
 
     // calculate share % of earnings based on # event mint tokens
+    let total_earnings = ctx.accounts.gain_vault.amount;
     let share = calculate_share(total_tokens, tokens_to_burn);
     // calculate total earning amount based on share %
     let total_to_deposit = calculate_earnings(total_earnings, share);
@@ -80,6 +83,7 @@ pub fn handle(ctx: Context<WithdrawEarnings>) -> Result<()> {
     ];
     let signer = &[&seeds[..]]; // event PDA seeds
 
+    // 
     transfer(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
