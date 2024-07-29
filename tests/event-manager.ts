@@ -26,11 +26,20 @@ describe("event-manager", () => {
   let treasuryVault: PublicKey;
   let gainVault: PublicKey;
 
-  // Sponsor
+  // Sponsor Alice
   let alice: Keypair; // alice key pair - first sponsor
   let aliceAcceptedMintATA: PublicKey; // alice accepted mint ATA
   let aliceEventMintATA: PublicKey; // alice event mint ATA
 
+  // provider (event organizer) wallet 
+  let walletAcceptedMintATA: PublicKey; //provider wallet accepted mint ATA
+
+  // Sponsor Bob
+  let bob: Keypair; // bob key pair
+  let bobAcceptedMintATA: PublicKey; // bob accepted mint ATA
+  let bobEventMintATA: PublicKey; // bob event mint ATA
+
+  // all this should exists **before** calling our program instructions
   before(async () => {
     acceptedMint = await createMint(provider); // aux functions solana web3
 
@@ -58,7 +67,7 @@ describe("event-manager", () => {
       program.programId
     );
 
-    // creates a new wallet funded with 3 SOL 
+    // creates alice: a new wallet funded with 3 SOL 
     alice = await createFundedWallet(provider, 3);
     // create alice accepted mint ata with 100 accepted mint
     // Accepted mint = USDC  -> alice wallet = 100 USDC 
@@ -69,6 +78,13 @@ describe("event-manager", () => {
     // find provided (event organizer) wallet acceptend mint ata
     // only the address
     walletAcceptedMintATA = await getAssociatedTokenAddress(acceptedMint, provider.wallet.publicKey);
+
+    // create bob wallet with lamports
+    bob = await createFundedWallet(provider);
+    // create bob accepted mint ata
+    bobAcceptedMintATA = await createAssociatedTokenAccount(provider, acceptedMint, 500, bob)
+    // find bob event mint ata
+    bobEventMintATA = await getAssociatedTokenAddress(eventMint, bob.publicKey);
 
 
   });
@@ -133,8 +149,33 @@ describe("event-manager", () => {
 
   });
 
-  // TEST: Alice, Buy 2 Tickets
-  it("Alice buy 2 tickets", async () => {
+  // TEST Bob: Sponsor event
+  it("Bob Should get 48 event tokens", async () => {
+    const quantity = new BN(48);
+    await program.methods
+      .sponsorEvent(quantity)
+      .accounts({
+        eventMint: eventMint,
+        payerAcceptedMintAta: bobAcceptedMintATA,
+        event: eventPublicKey,
+        authority: bob.publicKey,
+        payerEventMintAta: bobEventMintATA,
+        treasuryVault: treasuryVault
+      })
+      .signers([bob])
+      .rpc();
+
+    // show bob event mint ATA info
+    const bobAccount = await getAccount(
+      provider.connection,
+      bobEventMintATA
+    );
+    console.log("Bob sponsorship tokens: ", bobAccount.amount);
+  });
+
+
+  // TEST: Alice, Buy 23 Tickets
+  it("Alice buy 23 tickets", async () => {
     // show alice accepted mint (USDC) ATA info
     // should have 95 USDC
     let aliceUSDCBalance = await getAccount(
@@ -142,8 +183,9 @@ describe("event-manager", () => {
       aliceAcceptedMintATA // Alice Accepted mint account (USDC account)
     );
     console.log("Alice Accepted mint ATA: ", aliceUSDCBalance);
+    console.log("Alice USDC amount before: ", aliceUSDCBalance.amount);
 
-    const quantity = new BN(2); // 2 tickets
+    const quantity = new BN(23); // 23 tickets
     await program.methods
       .buyTickets(quantity)
       .accounts({
@@ -173,6 +215,30 @@ describe("event-manager", () => {
 
   });
 
+  // TEST: Buy 154 Tickets
+  it("Bob buy 154 tickets", async () => {
+    // Add your test here.
+    const quantity = new BN(154);
+    await program.methods
+      .buyTickets(quantity)
+      .accounts({
+        payerAcceptedMintAta: bobAcceptedMintATA,
+        event: eventPublicKey,
+        authority: bob.publicKey,
+        gainVault: gainVault
+      })
+      .signers([bob])
+      .rpc();
+
+    // show event gain vault info
+    const gainVaultAccount = await getAccount(
+      provider.connection,
+      gainVault
+    );
+    console.log("Event gain vault amount: ", gainVaultAccount.amount);
+
+  });
+
 
   // TEST: Withdraw Funds
   it("Event organizer should withdraw funds", async () => {
@@ -195,7 +261,7 @@ describe("event-manager", () => {
       provider.connection,
       treasuryVault
     );
-    console.log("Event treasury vault: ", treasuryVaultAccount);
+    console.log("Event treasury vault total after: ", treasuryVaultAccount.amount);
 
     // show event organizer accepted mint (USDC) ATA info
     // should have 1 accepte mint (USDC) 
@@ -203,7 +269,7 @@ describe("event-manager", () => {
       provider.connection,
       walletAcceptedMintATA // event organizer Accepted mint account (USDC account)
     );
-    console.log("Alice Accepted mint ATA: ", organizerUSDCBalance);
+    console.log("Alice Accepted mint ATA: ", organizerUSDCBalance.amount);
 
   });
 
