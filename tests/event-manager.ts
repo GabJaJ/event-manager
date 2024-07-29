@@ -223,7 +223,70 @@ describe("event-manager", () => {
     console.log("Event is active: ", eventAccount.active);
   });
 
-  
+  // TEST: Can't Buy 2 Tickets
+  it("Alice can't buy tickets", async () => {
+
+    let error: anchor.AnchorError;
+    const quantity = new BN(2);
+    try {
+      await program.methods
+        .buyTickets(quantity)
+        .accounts({
+          payerAcceptedMintAta: aliceAcceptedMintATA,
+          event: eventPublicKey,
+          authority: alice.publicKey,
+          gainVault: gainVault
+        })
+        .signers([alice])
+        .rpc();
+    } catch (err) {
+      error = err;
+    }
+    assert.equal(error.error.errorCode.code, "EventClosed");
+    console.log("You can't buy tickets, the Event is already closed");
+  });
+
+  // TEST: Withdraw earnings
+  it("Alice Should withdraw earnings", async () => {
+
+    // show total sponsorships
+    const eventAccount = await program.account.event.fetch(eventPublicKey);
+    console.log("Event total sponsorships: ", eventAccount.sponsors.toNumber());
+
+    // show event gain vault amount
+    let gainVaultAccount = await getAccount(
+      provider.connection,
+      gainVault
+    );
+    console.log("Event gain vault amount: ", gainVaultAccount.amount);
+
+    // show Alice sponsorship tokens
+    let aliceTokens = await getAccount(
+      provider.connection,
+      aliceEventMintATA
+    );
+    console.log("Alice sponsorship tokens: ", aliceTokens.amount);
+
+    await program.methods
+      .withdrawEarnings()
+      .accounts({
+        userEventMintAta: aliceEventMintATA,
+        event: eventPublicKey,
+        authority: alice.publicKey,
+        gainVault: gainVault,
+        userAcceptedMintAta: aliceAcceptedMintATA,
+        eventMint: eventMint
+      })
+      .signers([alice])
+      .rpc();
+
+    // show event gain vault amount
+    gainVaultAccount = await getAccount(
+      provider.connection,
+      gainVault
+    );
+    console.log("Event gain vault amount: ", gainVaultAccount.amount);
+  });
 
 
 });
