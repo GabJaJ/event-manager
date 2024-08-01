@@ -1,11 +1,11 @@
-# Decentralized Event Manager - Solana - Rust
+# Cannart - Solana - Rust
 
-✨ **DECENTRALIZED EVENT MANAGER** ✨
+✨ **CANABIS DECENTRALIZED MANAGER** ✨
 
-## ADMINISTRATION EVENTS PROGRAM IN SOLANA
+## ADMINISTRATION ON CANNABIS PROGRAM IN SOLANA
 
 The objective of this project is to develop a
-DECENTRALIZED EVENT MANAGER
+DECENTRALIZED CANNABIS MANAGER
 based on the Solana blockchain. This
 administrator will allow users to create
 events, participate as collaborators, sell
